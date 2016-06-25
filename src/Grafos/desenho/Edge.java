@@ -4,8 +4,15 @@
  */
 package Grafos.desenho;
 
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.geometry.Point2D;
 
 /**
@@ -60,6 +67,103 @@ public class Edge {
         }
 
         g2.setGlobalAlpha(1.0f);
+    }
+    
+    public Group connect(Circle c1, Circle c2) {
+    	Group arrow = new Group();
+        Line line = new Line();
+        
+        if (selected) {
+            line.setOpacity(1.0f);
+            line.setStrokeWidth(3.0f);
+        } else {
+            line.setStrokeWidth(1.0f);
+            if ((this.target.isSelected() && this.source.isSelected())) { //se os vertices estao selecionados
+                line.setOpacity(0.5f);
+            } else {//se os vertices nao estao selecionados
+            	line.setOpacity(0.2f);
+            }
+        }
+        
+        this.color = new Color((this.source.getColor().getRed() + this.target.getColor().getRed()) / 2,
+                (this.source.getColor().getGreen() + this.target.getColor().getGreen()) / 2,
+                (this.source.getColor().getBlue() + this.target.getColor().getBlue()) / 2, 1.0);
+
+        line.startXProperty().bind(c1.centerXProperty());
+        line.startYProperty().bind(c1.centerYProperty());
+
+        line.endXProperty().bind(c2.centerXProperty());
+        line.endYProperty().bind(c2.centerYProperty());
+
+        line.setStroke(color);
+        
+	    line.toBack();
+	    
+	    arrow.getChildren().add(line);
+	    
+	    if(isDirected()){
+	    	int size = 6;
+	    	int deslocamento = 30;
+//	    	Point2D s = new Point2D((int) source.getX(), (int) source.getY());
+//	    	Point2D t = new Point2D((int) target.getX(), (int) target.getY());    	
+//	    	float r = (float) Math.sqrt(Math.pow(s.getX() - t.getX(), 2) + Math.pow(s.getY() - t.getY(), 2));
+//	        float cos = (float) ((t.getX() - s.getX()) / r);
+//	        float sen = (float) ((t.getY() - s.getY()) / r); 
+	    	
+	    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
+            	System.out.println(newvalue);	
+	        	}
+	        );
+	    
+	    	double SourceX = line.startXProperty().get();
+	    	double TargetX = line.endXProperty().get();
+	    	double SourceY = line.startYProperty().get();
+	    	double TargetY = line.endYProperty().get();
+	    	float r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
+	        float cos = (float) ((TargetX - SourceX) / r);
+	        float sen = (float) ((TargetY - SourceY) / r);
+	        
+	    	
+	        int xAB = size + deslocamento;
+	        int yA = size;
+	        int yB = -size;
+	             
+//	        g2.strokeLine(pc.getX(), pc.getY(), pa.getX(), pa.getY());
+//	        g2.strokeLine(pc.getX(), pc.getY(), pb.getX(), pb.getY());
+	        Line line1 = new Line();
+	        Line line2 = new Line();
+	 
+	        line1.endYProperty().bind(line.endYProperty().add(Math.round( xAB * -sen + yA * -cos )));
+	        line1.endXProperty().bind(line.endXProperty().add(Math.round( xAB * -cos - yA * -sen )));
+	        
+	        line1.setStrokeWidth(4.0f);
+	        line1.startXProperty().bind(line.endXProperty().add(Math.round( deslocamento * -cos)));
+	        line1.startYProperty().bind(line.endYProperty().add(Math.round( deslocamento * -sen)));
+	        
+
+	        line2.endYProperty().bind(line.endYProperty().add(Math.round( xAB * -sen + yB * -cos )));
+	        line2.endXProperty().bind(line.endXProperty().add(Math.round( xAB * -cos - yB * -sen )));
+	        line2.setStrokeWidth(4.0f);
+	        line2.startXProperty().bind(line.endXProperty().add(Math.round( deslocamento * -cos)));
+	        line2.startYProperty().bind(line.endYProperty().add(Math.round( deslocamento * -sen)));
+	        
+	        arrow.getChildren().add(line1);
+	        arrow.getChildren().add(line2);
+	        
+	    }
+
+        return arrow;
+    }
+    
+    
+    
+    public Vertex getSource()
+    {
+    	return this.source;
+    }
+    
+    public Vertex getTarget(){
+    	return this.target;
     }
     
     private void drawArrowNew(GraphicsContext g2, Point2D s, Point2D t, int size, int deslocamento) {

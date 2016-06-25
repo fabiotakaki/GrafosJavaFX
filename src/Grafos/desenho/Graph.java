@@ -7,7 +7,10 @@ package Grafos.desenho;
 import Grafos.desenho.color.ColorScale;
 import Grafos.desenho.color.GrayScale;
 import Grafos.desenho.color.RainbowScale;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.Group;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
 
@@ -61,16 +64,23 @@ public class Graph {
     public ArrayList<Vertex> getVertex() {
         return this.vertex;
     }
-
-    public void draw(GraphicsContext g2) {
-       //Draw each edges of the graph
-        for (Edge edge : edges) {
-            edge.draw(g2);
-        }
-        //Draw each vertice of the graph
+    
+    public void addObjects(BorderPane bp){
+    	//Draw each vertice of the graph
+    	Group group = new Group();
         for (Vertex v : this.vertex) {
-            v.draw(g2);
+            Circle circle = v.createCircle();
+            group.getChildren().add(circle);
         }
+        
+        for (Edge edge : edges) {
+            Group line = edge.connect(edge.getSource().getCircle(), edge.getTarget().getCircle());
+            group.getChildren().add(line);
+            edge.getSource().getCircle().toFront();
+            edge.getTarget().getCircle().toFront();
+        }
+        
+        bp.setCenter(group);
     }
 
     public java.awt.Dimension getSize() {

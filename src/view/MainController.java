@@ -31,9 +31,6 @@ public class MainController {
     // Reference to the main application.
     private Main mainApp;
     
-    @FXML
-    private Canvas canvasGraph;
-    
     private Graph graph;
     private Grafo grafo;
     
@@ -95,7 +92,7 @@ public class MainController {
 
                 }  //se tiver peso nas arestas, adicionar mais uma leitura de token
 
-                this.repaint();              
+                this.addObjects();              
 
             } catch (IOException ex) {
                 Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,11 +109,8 @@ public class MainController {
         } // fim do if
     }
     
-    protected void repaint(){
-    	GraphicsContext gc = this.canvasGraph.getGraphicsContext2D();
-        // limpa canvas pra desenhar
-        gc.clearRect(0, 0, canvasGraph.getWidth(), canvasGraph.getHeight());
-        graph.draw(gc);
+    protected void addObjects(){
+    	graph.addObjects(mainApp.getBP());
     }
     
     @FXML
@@ -132,8 +126,8 @@ public class MainController {
         for (int i = 0; i < cores.length; i++) {
             System.out.println("Vertice: " + i + " Cor: " + cores[i]);
             this.graph.getVertex().get(i).setColor(rbS.getColor(cores[i] * coresStep));
+            this.graph.getVertex().get(i).changeColor();
         }
-        this.repaint();
     }
     
     @FXML
@@ -150,7 +144,6 @@ public class MainController {
             System.out.println("Vertice: " + i + " Compoente: " + comp[i]);
             this.graph.getVertex().get(i).setColor(rbS.getColor(comp[i] * compStep));
         }
-        this.repaint();
     }
     
     

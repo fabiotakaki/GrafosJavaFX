@@ -21,6 +21,10 @@ public class Main extends Application {
 
         initRootLayout();
     }
+    
+    public BorderPane getBP(){
+    	return rootLayout;
+    }
 
     /**
      * Inicializa o root layout (layout base).
@@ -31,6 +35,7 @@ public class Main extends Application {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("/view/MainView.fxml"));
             rootLayout = (BorderPane) loader.load();
+
 
             // Mostra a scene (cena) contendo oroot layout.
             Scene scene = new Scene(rootLayout);
