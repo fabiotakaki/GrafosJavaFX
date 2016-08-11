@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import view.MainController;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
 import javafx.fxml.FXMLLoader;
 
 
@@ -36,6 +37,9 @@ public class Main extends Application {
             loader.setLocation(Main.class.getResource("/view/MainView.fxml"));
             rootLayout = (BorderPane) loader.load();
 
+            Text t = new Text();
+            t.setText("Seja bem-vindo(a) ao trabalho de grafos. Abra um grafo para continuar.");
+            rootLayout.setCenter(t);
 
             // Mostra a scene (cena) contendo oroot layout.
             Scene scene = new Scene(rootLayout);

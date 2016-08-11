@@ -1,8 +1,16 @@
 package view;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import javafx.geometry.Insets;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 
 import java.io.BufferedReader;
@@ -15,7 +23,7 @@ import java.util.logging.Logger;
 
 import controller.Grafo;
 import controller.ListaAdjacencia;
-
+import controller.MatrizAdjacencia;
 //algoritmos
 import controller.ComponentesConexas;
 import controller.Coloracao;
@@ -34,6 +42,9 @@ public class MainController {
     private Graph graph;
     private Grafo grafo;
     
+    @FXML
+    private MenuBar menuBar;
+    
     /**
      * É chamado pela aplicação principal para referenciar a si mesma.
      * 
@@ -49,7 +60,7 @@ public class MainController {
     @FXML
     private void openGraph() {
         FileChooser fileChooser = new FileChooser();
-
+        
         // Define um filtro de extensão
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT Files (*.txt)", "*.txt");
         fileChooser.getExtensionFilters().add(extFilter);
@@ -64,12 +75,12 @@ public class MainController {
                 in = new BufferedReader(new FileReader(filename));
                 ////////LEMBRAR DE VERIFICAR SE É GRAFO OU DÍGRAFO
                 ////////FAZER O TRATAMENTO NA INSERÇÃO DOS DADOS NA ESTRUTURA
-                //int grafo = Integer.parseInt(in.readLine());
+                int grafo = Integer.parseInt(in.readLine());
                 
                 //le numero de vertices
                 int nVert =  Integer.parseInt(in.readLine());
                 this.graph = new Graph(nVert); ///desenho
-                this.grafo = new Grafo(nVert, new ListaAdjacencia()); ///estrutura de dados
+                this.grafo = new Grafo(nVert, new MatrizAdjacencia()); ///estrutura de dados
 
                 //leitura das arestas
                 String line;
@@ -77,12 +88,12 @@ public class MainController {
                     StringTokenizer t1 = new StringTokenizer(line, " ");
                     int vIni = Integer.parseInt(t1.nextToken().trim()); //verticeInicial
                     int vFim = Integer.parseInt(t1.nextToken().trim()); //verticeFinal
-                    //int vPeso = Integer.parseInt(t1.nextToken().trim()); //Peso do Vértice
+                    int vPeso = Integer.parseInt(t1.nextToken().trim()); //Peso do Vértice
                     
                     Vertex vS = this.graph.getVertex().get(vIni);
                     Vertex vT = this.graph.getVertex().get(vFim);
-                    this.grafo.addAresta(vIni, vFim); //estrutura de dados
-                    Edge e = new Edge(vS, vT); //desenho
+                    this.grafo.addAresta(vIni, vFim, vPeso, grafo); //estrutura de dados
+                    Edge e = new Edge(vS, vT, vPeso, grafo); //desenho
                     //Exemplo de seleção de aresta
                     if (vIni % 2 == 0){
                         e.setSelected(true);                        
@@ -92,7 +103,43 @@ public class MainController {
 
                 }  //se tiver peso nas arestas, adicionar mais uma leitura de token
 
-                this.addObjects();              
+                this.addObjects();
+                
+                // Gero o menu algoritmos
+                // verifico se existe algum menu já criado e deleto
+                if(menuBar.getMenus().size() > 1) menuBar.getMenus().remove(1);
+                
+                final Menu algorithms = new Menu("Algoritmos");
+                algorithms.setId("algorithms");
+                menuBar.getMenus().add(algorithms);
+    
+                if(grafo == 0){
+	                // Coloração
+	                MenuItem coloracao = new MenuItem("Coloração");
+	                algorithms.getItems().add(coloracao);
+	                coloracao.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                        coloracao();
+	                    }
+	                });
+	                
+	                // Componentes
+	                MenuItem componentes = new MenuItem("Componentes");
+	                algorithms.getItems().add(componentes);
+	                componentes.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	componentes();
+	                    }
+	                });
+                }
+                
+                // mensagem
+                TextFlow message = new TextFlow();
+                message.setPadding(new Insets(20, 20, 20, 20));
+                Text text = new Text("Selecione um algoritmo para interagir com o grafo ou dígrafo.");
+                text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+                message.getChildren().addAll(text);
+                mainApp.getBP().setBottom(message);
 
             } catch (IOException ex) {
                 Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,7 +160,6 @@ public class MainController {
     	graph.addObjects(mainApp.getBP());
     }
     
-    @FXML
     private void coloracao(){
     	if(grafo == null) return;
         Coloracao coloracao = new Coloracao();
@@ -130,7 +176,6 @@ public class MainController {
         }
     }
     
-    @FXML
     private void componentes(){
     	// TODO add your handling code here:
     	if(grafo == null) return;
@@ -141,8 +186,9 @@ public class MainController {
         int compStep = 255 / numComp;
         RainbowScale rbS = new RainbowScale();
         for (int i = 0; i < comp.length; i++) {
-            System.out.println("Vertice: " + i + " Compoente: " + comp[i]);
+            System.out.println("Vertice: " + i + " Componente: " + comp[i]);
             this.graph.getVertex().get(i).setColor(rbS.getColor(comp[i] * compStep));
+            this.graph.getVertex().get(i).changeColor();
         }
     }
     

@@ -5,15 +5,13 @@
 package Grafos.desenho;
 
 import javafx.scene.Group;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.geometry.Point2D;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 /**
  *
@@ -24,50 +22,21 @@ public class Edge {
     private Color color = Color.WHITE; //Cor da aresta
     private Vertex source; //primeiro vetice da aresta
     private Vertex target; //segundo vertice da aresta
+    private int weight; //Peso
     private Boolean directed = true; //se a aresta é direcionada
     private Boolean selected = false; //se a aresta está selecionada
 
-    public Edge(Vertex source, Vertex target) {
+    public Edge(Vertex source, Vertex target, int weight, int directed) {
         this.source = source;
         this.target = target;
+        this.weight = weight;
+        if(directed == 0) this.directed = false;
     }
-
-    public void draw(GraphicsContext g2) {
-        //Combines the color of the two vertex to paint the edge
-
-        if (selected) {
-            g2.setGlobalAlpha(1.0f);
-            g2.setLineWidth(3.0f);
-        } else {
-            g2.setLineWidth(1.0f);
-            if ((this.target.isSelected() && this.source.isSelected())) { //se os vertices estao selecionados
-                g2.setGlobalAlpha(0.5f);
-            } else {//se os vertices nao estao selecionados
-                g2.setGlobalAlpha(0.2f);
-            }
-        }
-       this.color = new Color((this.source.getColor().getRed() + this.target.getColor().getRed()) / 2,
-                (this.source.getColor().getGreen() + this.target.getColor().getGreen()) / 2,
-                (this.source.getColor().getBlue() + this.target.getColor().getBlue()) / 2, 1.0);
-
-        g2.setStroke(this.color);
-        
-        g2.strokeLine(((int) this.source.getX()), ((int) this.source.getY()),
-                ((int) this.target.getX()), ((int) this.target.getY()));
-        g2.setLineWidth(1.0f);
-
-        if (isDirected()) {
-//            drawArrow(g2, new Point2D((int) source.getX(), (int) source.getY()),
-//                    new Point2D((int) target.getX(), (int) target.getY()),
-//                    6.0f);
-            
-            drawArrowNew(g2, new Point2D((int) source.getX(), (int) source.getY()),
-                    new Point2D((int) target.getX(), (int) target.getY()),
-                    6, 14);
-        }
-
-        g2.setGlobalAlpha(1.0f);
-    }
+    
+    // para direcionado
+    private float r;
+    private float cos;
+    private float sen;
     
     public Group connect(Circle c1, Circle c2) {
     	Group arrow = new Group();
@@ -101,58 +70,104 @@ public class Edge {
 	    
 	    arrow.getChildren().add(line);
 	    
+        TextFlow weight = new TextFlow();
+        weight.setLayoutX((line.startXProperty().doubleValue() + line.endXProperty().doubleValue())/ 2);
+        weight.setLayoutY((line.startYProperty().doubleValue() + line.endYProperty().doubleValue())/ 2);
+        Text text = new Text(Integer.toString(this.weight));
+        text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        weight.getChildren().addAll(text);
+        arrow.getChildren().add(weight);
+	    
 	    if(isDirected()){
-	    	int size = 6;
-	    	int deslocamento = 30;
-//	    	Point2D s = new Point2D((int) source.getX(), (int) source.getY());
-//	    	Point2D t = new Point2D((int) target.getX(), (int) target.getY());    	
-//	    	float r = (float) Math.sqrt(Math.pow(s.getX() - t.getX(), 2) + Math.pow(s.getY() - t.getY(), 2));
-//	        float cos = (float) ((t.getX() - s.getX()) / r);
-//	        float sen = (float) ((t.getY() - s.getY()) / r); 
-	    	
-	    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
-            	System.out.println(newvalue);	
-	        	}
-	        );
 	    
 	    	double SourceX = line.startXProperty().get();
 	    	double TargetX = line.endXProperty().get();
 	    	double SourceY = line.startYProperty().get();
 	    	double TargetY = line.endYProperty().get();
-	    	float r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
-	        float cos = (float) ((TargetX - SourceX) / r);
-	        float sen = (float) ((TargetY - SourceY) / r);
+	    	this.r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
+	        this.cos = (float) ((TargetX - SourceX) / r);
+	        this.sen = (float) ((TargetY - SourceY) / r);
 	        
 	    	
-	        int xAB = size + deslocamento;
-	        int yA = size;
-	        int yB = -size;
 	             
-//	        g2.strokeLine(pc.getX(), pc.getY(), pa.getX(), pa.getY());
-//	        g2.strokeLine(pc.getX(), pc.getY(), pb.getX(), pb.getY());
 	        Line line1 = new Line();
 	        Line line2 = new Line();
 	 
-	        line1.endYProperty().bind(line.endYProperty().add(Math.round( xAB * -sen + yA * -cos )));
-	        line1.endXProperty().bind(line.endXProperty().add(Math.round( xAB * -cos - yA * -sen )));
-	        
-	        line1.setStrokeWidth(4.0f);
-	        line1.startXProperty().bind(line.endXProperty().add(Math.round( deslocamento * -cos)));
-	        line1.startYProperty().bind(line.endYProperty().add(Math.round( deslocamento * -sen)));
-	        
-
-	        line2.endYProperty().bind(line.endYProperty().add(Math.round( xAB * -sen + yB * -cos )));
-	        line2.endXProperty().bind(line.endXProperty().add(Math.round( xAB * -cos - yB * -sen )));
-	        line2.setStrokeWidth(4.0f);
-	        line2.startXProperty().bind(line.endXProperty().add(Math.round( deslocamento * -cos)));
-	        line2.startYProperty().bind(line.endYProperty().add(Math.round( deslocamento * -sen)));
+	    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow(line, line1, line2);     
+	        });
+	    	
+	    	line.endYProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow(line, line1, line2);
+	        });
+	    	
+	    	line.startXProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow(line, line1, line2);
+	        });
+	    	
+	    	line.startYProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow(line, line1, line2);
+		        
+	        });
+	    	
+	    	updateArrow(line, line1, line2);
 	        
 	        arrow.getChildren().add(line1);
 	        arrow.getChildren().add(line2);
 	        
 	    }
+	    
+	    line.endXProperty().addListener((observable, oldvalue, newvalue)->{
+    		weight.setLayoutX((line.startXProperty().get() + newvalue.doubleValue())/2);
+	        
+        });
+    	
+    	line.endYProperty().addListener((observable, oldvalue, newvalue)->{
+    		weight.setLayoutY((line.startYProperty().get() + newvalue.doubleValue())/2);
+	        
+        });
+    	
+    	line.startXProperty().addListener((observable, oldvalue, newvalue)->{
+    		weight.setLayoutX((newvalue.doubleValue() + line.endXProperty().get())/2);
+        });
+    	
+    	line.startYProperty().addListener((observable, oldvalue, newvalue)->{
+    		weight.setLayoutY((newvalue.doubleValue() + line.endYProperty().get())/2); 
+        });
 
         return arrow;
+    }
+    
+    protected void updateArrow(Line line, Line line1, Line line2){
+    	int size = 6;
+    	int deslocamento = 30;
+    	
+    	double SourceX = line.startXProperty().get();
+    	double TargetX = line.endXProperty().get();
+    	double SourceY = line.startYProperty().get();
+    	double TargetY = line.endYProperty().get();
+        
+        this.r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
+        this.cos = (float) ((TargetX - SourceX) / r);
+        this.sen = (float) ((TargetY - SourceY) / r);
+        
+        int xAB = size + deslocamento;
+        int yA = size;
+        int yB = -size;
+    	
+        line1.setEndY(TargetY + Math.round( xAB * -sen + yA * -cos ));
+        line1.setEndX(TargetX + Math.round( xAB * -cos - yA * -sen ));
+        
+        line1.setStrokeWidth(4.0f);
+        line1.setStartX(TargetX + Math.round( deslocamento * -cos));
+        line1.setStartY(TargetY + Math.round( deslocamento * -sen));
+        
+
+        line2.setEndY(TargetY +Math.round( xAB * -sen + yB * -cos ));
+        line2.setEndX(TargetX + Math.round( xAB * -cos - yB * -sen ));
+        line2.setStrokeWidth(4.0f);
+        line2.setStartX(TargetX + Math.round( deslocamento * -cos));
+        line2.setStartY(TargetY + Math.round( deslocamento * -sen));
     }
     
     
@@ -164,44 +179,6 @@ public class Edge {
     
     public Vertex getTarget(){
     	return this.target;
-    }
-    
-    private void drawArrowNew(GraphicsContext g2, Point2D s, Point2D t, int size, int deslocamento) {
-        float r = (float) Math.sqrt(Math.pow(s.getX() - t.getX(), 2) + Math.pow(s.getY() - t.getY(), 2));
-        float cos = (float) ((t.getX() - s.getX()) / r);
-        float sen = (float) ((t.getY() - s.getY()) / r);                
-        
-        int xAB = size + deslocamento;
-        int yA = size;
-        int yB = -size;
-        
-        Point2D pa = new Point2D(Math.round( xAB * -cos - yA * -sen )+t.getX(), Math.round( xAB * -sen + yA * -cos )+t.getY());
-        Point2D pb = new Point2D(Math.round( xAB * -cos - yB * -sen )+t.getX(), Math.round( xAB * -sen + yB * -cos )+t.getY());
-        Point2D pc = new Point2D(Math.round( deslocamento * -cos)+t.getX(), Math.round( deslocamento * -sen)+t.getY());
-        
-        g2.strokeLine(pc.getX(), pc.getY(), pa.getX(), pa.getY());
-        g2.strokeLine(pc.getX(), pc.getY(), pb.getX(), pb.getY());
-    }
-
-    private void drawArrow(GraphicsContext g2, Point2D s, Point2D t, float size) {
-        float r = (float) Math.sqrt(Math.pow(s.getX() - t.getX(), 2) + Math.pow(s.getY() - t.getY(), 2));
-        float cos = (float) ((t.getX() - s.getX()) / (r));
-        float sen = (float) ((t.getY() - s.getY()) / (r));
-
-        //rotação e translação
-        int transX = (int) ((t.getX() + s.getX()) * 0.5f); //metade da reta
-        int transY = (int) ((t.getY() + s.getY()) * 0.5f); //metade da reta
-
-        Point2D pa = new Point2D(Math.round(-sen * size) + (transX), Math.round(cos * size) + (transY));
-        Point2D pb = new Point2D(Math.round(-sen * -size) + (transX), Math.round(cos * -size) + (transY));
-        Point2D pc = new Point2D(Math.round(cos * size) + (transX), Math.round(sen * size) + (transY));
-
-        g2.strokeLine(pa.getX(), pa.getY(), pc.getX(), pc.getY());
-        g2.strokeLine(pb.getX(), pb.getY(), pc.getX(), pc.getY());
-
-//        g2.setFont(new Font("Verdana", Font.BOLD, 10));
-//        java.awt.FontMetrics metrics = g2.getFontMetrics(g2.getFont());
-//        g2.drawString("T", pc.x, pc.y);
     }
 
     public Boolean isDirected() {

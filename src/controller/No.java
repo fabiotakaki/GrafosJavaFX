@@ -13,10 +13,12 @@ package controller;
  */
 public class No {
     private int vertID;
+    private int weight;
     private No prox;
 
-    public No(int vertID) {
+    public No(int vertID, int weight) {
         this.vertID = vertID;
+        this.setWeight(weight);
         this.prox = null;
     }
 
@@ -35,4 +37,12 @@ public class No {
     public void setProx(No prox) {
         this.prox = prox;
     }
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
 }

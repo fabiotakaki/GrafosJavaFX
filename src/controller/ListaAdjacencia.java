@@ -21,14 +21,21 @@ public class ListaAdjacencia extends Representacao{
     }
 
     @Override
-    public void addAresta(int vIni, int vFim) {
-        No novoNo = new No(vFim);
+    public void addAresta(int vIni, int vFim, int weight) {
+        No novoNo = new No(vFim, weight);
         novoNo.setProx( listaVertices[vIni] );
         listaVertices[vIni] = novoNo;
 
-        novoNo = new No(vIni);
+        novoNo = new No(vIni, weight);
         novoNo.setProx( listaVertices[vFim] );
         listaVertices[vFim] = novoNo;
+    }
+    
+    @Override
+    public void addArestaD(int vIni, int vFim, int weight) {
+        No novoNo = new No(vFim, weight);
+        novoNo.setProx( listaVertices[vIni] );
+        listaVertices[vIni] = novoNo;
     }
 
     public No getAdjacentes(int vert){

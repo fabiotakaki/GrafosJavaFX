@@ -15,6 +15,7 @@ public abstract class Representacao {
         return numVert;
     }
     public abstract void init(int numVertices);
-    public abstract void addAresta(int vIni, int vFim);
+    public abstract void addAresta(int vIni, int vFim, int weight);
+    public abstract void addArestaD(int vIni, int vFim, int weight);
     public abstract void imprimeRepresentacao(String mensagem);
 }
