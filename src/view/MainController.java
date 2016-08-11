@@ -4,14 +4,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +27,6 @@ import java.util.logging.Logger;
 
 import controller.Grafo;
 import controller.ListaAdjacencia;
-import controller.MatrizAdjacencia;
 //algoritmos
 import controller.ComponentesConexas;
 import controller.Coloracao;
@@ -32,6 +35,7 @@ import Grafos.desenho.Edge;
 import Grafos.desenho.Graph;
 import Grafos.desenho.Vertex;
 import Grafos.desenho.color.RainbowScale;
+import application.FxImaging;
 import application.Main;
 
 public class MainController {
@@ -52,6 +56,48 @@ public class MainController {
      */
     public void setMainApp(Main mainApp) {
         this.mainApp = mainApp;
+    }
+    
+    /**
+     * Sobre
+     */
+    @FXML
+    private void about(){
+    	FlowPane pane;
+    	pane = new FlowPane();
+		Scene scene = new Scene(pane, 200, 120);	
+
+	    Stage newStage = new Stage();
+	    newStage.setScene(scene);
+
+	    newStage.initModality(Modality.APPLICATION_MODAL);
+	    newStage.setTitle("Sobre");
+	    
+        TextFlow message = new TextFlow();
+        message.setPadding(new Insets(20, 20, 20, 20));
+        Text text = new Text("Desenvolvido por:\n");
+        text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        Text fabio = new Text("\nFábio S. Takaki");
+        Text arthur = new Text("\nArthur Pires");
+        Text lucas = new Text("\nLucas Martins");
+        message.getChildren().addAll(text, fabio);
+        
+        pane.getChildren().add(message);
+        newStage.showAndWait();
+    }
+    
+    /**
+     * Salva png como prometido :)
+     */
+    @FXML
+    private void saveToPNG(){
+    	FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar PNG");
+         
+        File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+        
+    	FxImaging imager = new FxImaging();
+        imager.nodeToImage(mainApp.getBP().getCenter(),mainApp.getBP().getChildren(),file);
     }
 
     /**
@@ -80,7 +126,7 @@ public class MainController {
                 //le numero de vertices
                 int nVert =  Integer.parseInt(in.readLine());
                 this.graph = new Graph(nVert); ///desenho
-                this.grafo = new Grafo(nVert, new MatrizAdjacencia()); ///estrutura de dados
+                this.grafo = new Grafo(nVert, new ListaAdjacencia()); ///estrutura de dados
 
                 //leitura das arestas
                 String line;

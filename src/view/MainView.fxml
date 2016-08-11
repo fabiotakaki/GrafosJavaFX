@@ -12,7 +12,8 @@
           <Menu mnemonicParsing="false" text="Arquivo">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#openGraph" text="Abrir" />
-                  <MenuItem mnemonicParsing="false" text="Salvar Imagem" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveToPNG" text="Salvar Imagem" />
+                  <MenuItem mnemonicParsing="false" onAction="#about" text="Sobre" />
             </items>
           </Menu>
         </menus>
