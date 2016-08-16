@@ -19,16 +19,21 @@ public class Grafo {
         this.representacao.init(numVert);
     }
 
-    public void addAresta(int vIni, int vFim, int weight, int grafo){
-    	if(grafo == 0)
-    		representacao.addAresta(vIni, vFim, weight);
-    	else
-    		representacao.addArestaD(vIni, vFim, weight);
+    public void addAresta(int vIni, int vFim, int weight){
+    	representacao.addAresta(vIni, vFim, weight);
+    }
+    
+    public void addArestaD(int vIni, int vFim, int weight){
+    	representacao.addArestaD(vIni, vFim, weight);
     }
 
     public Representacao getRepresentacao(){
         return representacao;
     }
+    
+    public boolean verifyAdjacency(int u, int v){
+		return representacao.verifyAdjacency(u, v);
+	}
 
     public void imprimeRepresentacao(String mensagem){
         representacao.imprimeRepresentacao(mensagem);
@@ -37,4 +42,9 @@ public class Grafo {
     public int getNumVertices(){
     	return numVertices;
     }
+
+	public int getWeight(int u, int v) {
+		// TODO Auto-generated method stub
+		return representacao.getWeight(u, v);
+	}
 }

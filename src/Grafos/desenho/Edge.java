@@ -25,6 +25,10 @@ public class Edge {
     private int weight; //Peso
     private Boolean directed = true; //se a aresta é direcionada
     private Boolean selected = false; //se a aresta está selecionada
+    private Line line;
+    private Group arrow;
+    private Line line1;
+    private Line line2;
 
     public Edge(Vertex source, Vertex target, int weight, int directed) {
         this.source = source;
@@ -38,11 +42,12 @@ public class Edge {
     private float cos;
     private float sen;
     
-    public Group connect(Circle c1, Circle c2) {
-    	Group arrow = new Group();
-        Line line = new Line();
-        
-        if (selected) {
+    public Line getConnect(){
+    	return this.line;
+    }
+    
+    public void clear(){
+    	if (selected) {
             line.setOpacity(1.0f);
             line.setStrokeWidth(3.0f);
         } else {
@@ -53,6 +58,43 @@ public class Edge {
             	line.setOpacity(0.2f);
             }
         }
+    	
+    	arrow.getChildren().remove(line1);
+    	arrow.getChildren().remove(line2);
+    	
+    	if(isDirected()){
+	        
+	        line1 = new Line();
+	        line2 = new Line();
+	 
+	    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow();     
+	        });
+	    	
+	    	line.endYProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow();
+	        });
+	    	
+	    	line.startXProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow();
+	        });
+	    	
+	    	line.startYProperty().addListener((observable, oldvalue, newvalue)->{
+	    		updateArrow();
+		        
+	        });
+	    	
+	    	updateArrow();
+	        
+	        arrow.getChildren().add(line1);
+	        arrow.getChildren().add(line2);
+	        
+	    }
+    }
+    
+    public Group connect(Circle c1, Circle c2) {
+    	arrow = new Group();
+        line = new Line();
         
         this.color = new Color((this.source.getColor().getRed() + this.target.getColor().getRed()) / 2,
                 (this.source.getColor().getGreen() + this.target.getColor().getGreen()) / 2,
@@ -78,44 +120,7 @@ public class Edge {
         weight.getChildren().addAll(text);
         arrow.getChildren().add(weight);
 	    
-	    if(isDirected()){
-	    
-	    	double SourceX = line.startXProperty().get();
-	    	double TargetX = line.endXProperty().get();
-	    	double SourceY = line.startYProperty().get();
-	    	double TargetY = line.endYProperty().get();
-	    	this.r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
-	        this.cos = (float) ((TargetX - SourceX) / r);
-	        this.sen = (float) ((TargetY - SourceY) / r);
-	        
-	    	
-	             
-	        Line line1 = new Line();
-	        Line line2 = new Line();
-	 
-	    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
-	    		updateArrow(line, line1, line2);     
-	        });
-	    	
-	    	line.endYProperty().addListener((observable, oldvalue, newvalue)->{
-	    		updateArrow(line, line1, line2);
-	        });
-	    	
-	    	line.startXProperty().addListener((observable, oldvalue, newvalue)->{
-	    		updateArrow(line, line1, line2);
-	        });
-	    	
-	    	line.startYProperty().addListener((observable, oldvalue, newvalue)->{
-	    		updateArrow(line, line1, line2);
-		        
-	        });
-	    	
-	    	updateArrow(line, line1, line2);
-	        
-	        arrow.getChildren().add(line1);
-	        arrow.getChildren().add(line2);
-	        
-	    }
+	    this.clear();
 	    
 	    line.endXProperty().addListener((observable, oldvalue, newvalue)->{
     		weight.setLayoutX((line.startXProperty().get() + newvalue.doubleValue())/2);
@@ -138,7 +143,7 @@ public class Edge {
         return arrow;
     }
     
-    protected void updateArrow(Line line, Line line1, Line line2){
+    protected void updateArrow(){
     	int size = 6;
     	int deslocamento = 30;
     	
@@ -170,7 +175,45 @@ public class Edge {
         line2.setStartY(TargetY + Math.round( deslocamento * -sen));
     }
     
-    
+    public void direct(){
+    	arrow.getChildren().remove(line1);
+    	arrow.getChildren().remove(line2);
+    	
+    	double SourceX = line.startXProperty().get();
+    	double TargetX = line.endXProperty().get();
+    	double SourceY = line.startYProperty().get();
+    	double TargetY = line.endYProperty().get();
+    	this.r = (float) Math.sqrt(Math.pow(SourceX - TargetX, 2) + Math.pow(SourceY - TargetY, 2));
+        this.cos = (float) ((TargetX - SourceX) / r);
+        this.sen = (float) ((TargetY - SourceY) / r);
+        
+    	
+             
+        line1 = new Line();
+        line2 = new Line();
+ 
+    	line.endXProperty().addListener((observable, oldvalue, newvalue)->{
+    		updateArrow();     
+        });
+    	
+    	line.endYProperty().addListener((observable, oldvalue, newvalue)->{
+    		updateArrow();
+        });
+    	
+    	line.startXProperty().addListener((observable, oldvalue, newvalue)->{
+    		updateArrow();
+        });
+    	
+    	line.startYProperty().addListener((observable, oldvalue, newvalue)->{
+    		updateArrow();
+	        
+        });
+    	
+    	updateArrow();
+        
+        arrow.getChildren().add(line1);
+        arrow.getChildren().add(line2);
+    }
     
     public Vertex getSource()
     {

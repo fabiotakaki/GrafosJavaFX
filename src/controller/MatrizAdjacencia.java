@@ -19,6 +19,11 @@ public class MatrizAdjacencia extends Representacao {
         weight = new int[numVertices][numVertices];
         fillMatrizAdjacencia(0);
     }
+    
+    @Override
+    public boolean verifyAdjacency(int u, int v){
+		return matriz[u][v] == 1;
+	}
 
     public void fillMatrizAdjacencia(int value) {
         for (int i = 0; i < matriz.length; i++) {
@@ -41,6 +46,11 @@ public class MatrizAdjacencia extends Representacao {
     }
     
     @Override
+    public int getWeight(int u, int v){
+    	return this.weight[u][v];
+    }
+    
+    @Override
     public void addArestaD(int vIni, int vFim, int weight) {
         int vi = vIni;
         int vj = vFim;
@@ -60,5 +70,37 @@ public class MatrizAdjacencia extends Representacao {
             }
             System.out.println("");
         }
+    }
+    
+    @Override
+    public int[][] getInverse(){
+    	int[][] inv = new int[matriz.length][matriz.length];
+    	for(int i=0; i < matriz.length; i++){
+    		for(int j=0; j < matriz[i].length; j++){
+    			inv[i][j] = 0;
+    		}
+    	}
+    	for(int i=0; i < matriz.length; i++){
+    		for(int j=0; j < matriz[i].length; j++){
+    			inv[i][j] = matriz[j][i];
+    		}
+    	}
+    	return inv;
+    }
+    
+    @Override
+    public int[][] getInverseWeight(){
+    	int[][] inv = new int[weight.length][weight.length];
+    	for(int i=0; i < weight.length; i++){
+    		for(int j=0; j < weight[i].length; j++){
+    			inv[i][j] = 0;
+    		}
+    	}
+    	for(int i=0; i < weight.length; i++){
+    		for(int j=0; j < weight[i].length; j++){
+    			inv[i][j] = weight[j][i];
+    		}
+    	}
+    	return inv;
     }
 }

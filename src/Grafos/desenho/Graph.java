@@ -4,13 +4,12 @@
  */
 package Grafos.desenho;
 
-import Grafos.desenho.color.ColorScale;
-import Grafos.desenho.color.GrayScale;
+//import Grafos.desenho.color.ColorScale;
+//import Grafos.desenho.color.GrayScale;
 import Grafos.desenho.color.RainbowScale;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 import java.util.ArrayList;
 
@@ -19,6 +18,8 @@ import java.util.ArrayList;
  * @author Danilo Medeiros Eler
  */
 public class Graph {
+	private Group group = new Group();
+	
     public Graph(int nVert) {
         RainbowScale cS = new RainbowScale();
         //GrayScale cS = new GrayScale();
@@ -65,9 +66,12 @@ public class Graph {
         return this.vertex;
     }
     
+    public ArrayList<Edge> getEdges() {
+        return this.edges;
+    }
+    
     public void addObjects(BorderPane bp){
     	//Draw each vertice of the graph
-    	Group group = new Group();
         for (Vertex v : this.vertex) {
             Circle circle = v.createCircle();
             group.getChildren().add(circle);
@@ -81,6 +85,21 @@ public class Graph {
         }
         
         bp.setCenter(group);
+    }
+    
+    public Group getGroup(){
+    	return group;
+    }
+    
+    public void clearObjects(){
+    	
+    	for (Vertex v : this.vertex) {
+    		v.clear();
+        }
+        
+        for (Edge edge : edges) {
+            edge.clear();
+        }
     }
 
     public java.awt.Dimension getSize() {

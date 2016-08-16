@@ -5,9 +5,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -27,6 +30,8 @@ import java.util.logging.Logger;
 
 import controller.Grafo;
 import controller.ListaAdjacencia;
+import controller.Transposed;
+import controller.WidthSearch;
 //algoritmos
 import controller.ComponentesConexas;
 import controller.Coloracao;
@@ -80,7 +85,7 @@ public class MainController {
         Text fabio = new Text("\nFábio S. Takaki");
         Text arthur = new Text("\nArthur Pires");
         Text lucas = new Text("\nLucas Martins");
-        message.getChildren().addAll(text, fabio);
+        message.getChildren().addAll(text, fabio, arthur, lucas);
         
         pane.getChildren().add(message);
         newStage.showAndWait();
@@ -121,7 +126,7 @@ public class MainController {
                 in = new BufferedReader(new FileReader(filename));
                 ////////LEMBRAR DE VERIFICAR SE É GRAFO OU DÍGRAFO
                 ////////FAZER O TRATAMENTO NA INSERÇÃO DOS DADOS NA ESTRUTURA
-                int grafo = Integer.parseInt(in.readLine());
+                int type_grafo = Integer.parseInt(in.readLine());
                 
                 //le numero de vertices
                 int nVert =  Integer.parseInt(in.readLine());
@@ -138,14 +143,25 @@ public class MainController {
                     
                     Vertex vS = this.graph.getVertex().get(vIni);
                     Vertex vT = this.graph.getVertex().get(vFim);
-                    this.grafo.addAresta(vIni, vFim, vPeso, grafo); //estrutura de dados
-                    Edge e = new Edge(vS, vT, vPeso, grafo); //desenho
-                    //Exemplo de seleção de aresta
-                    if (vIni % 2 == 0){
-                        e.setSelected(true);                        
+                    
+                    if(type_grafo == 0){
+                    	this.grafo.addAresta(vIni, vFim, vPeso); //estrutura de dados
+                    	Edge e1 = new Edge(vS, vT, vPeso, type_grafo); //desenho
+                    	this.graph.addEdge(e1);    //desenho
+                    	Edge e2 = new Edge(vT, vS, vPeso, type_grafo); //desenho
+                    	this.graph.addEdge(e2);    //desenho
+                    }else{
+                    	this.grafo.addArestaD(vIni, vFim, vPeso); //estrutura de dados
+                    	Edge e = new Edge(vS, vT, vPeso, type_grafo); //desenho
+                    	this.graph.addEdge(e);    //desenho
                     }
                     
-                    this.graph.addEdge(e);    //desenho
+                    
+//                    //Exemplo de seleção de aresta
+//                    if (vIni % 2 == 0){
+//                        e.setSelected(true);                        
+//                    }
+                    
 
                 }  //se tiver peso nas arestas, adicionar mais uma leitura de token
 
@@ -158,8 +174,39 @@ public class MainController {
                 final Menu algorithms = new Menu("Algoritmos");
                 algorithms.setId("algorithms");
                 menuBar.getMenus().add(algorithms);
+                
+                // limpar grafo
+                MenuItem clearGraph = new MenuItem("Limpar Grafo");
+                algorithms.getItems().add(clearGraph);
+                clearGraph.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						// TODO Auto-generated method stub
+						clearObjects();
+					} 	
+                });
+                
+                // Busca Largura
+                MenuItem largura = new MenuItem("Busca em Largura");
+                algorithms.getItems().add(largura);
+                largura.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override public void handle(ActionEvent e) {
+                    	SplitPane sp = new SplitPane();
+                    	Text t = new Text("Digite o vértice:");
+                    	TextField tf = new TextField();
+                    	Button execute = new Button("Executar");
+                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+                    		@Override public void handle(ActionEvent e){
+                    			buscaLargura(Integer.parseInt(tf.getText()));
+                    		}
+                    	});
+                    	sp.getItems().addAll(t, tf, execute);
+                    	mainApp.getBP().setBottom(sp);
+                    	buscaLargura(0);
+                    }
+                });
     
-                if(grafo == 0){
+                if(type_grafo == 0){
 	                // Coloração
 	                MenuItem coloracao = new MenuItem("Coloração");
 	                algorithms.getItems().add(coloracao);
@@ -170,11 +217,63 @@ public class MainController {
 	                });
 	                
 	                // Componentes
-	                MenuItem componentes = new MenuItem("Componentes");
+	                MenuItem componentes = new MenuItem("Componentes Conexas");
 	                algorithms.getItems().add(componentes);
 	                componentes.setOnAction(new EventHandler<ActionEvent>() {
 	                    @Override public void handle(ActionEvent e) {
 	                    	componentes();
+	                    }
+	                });
+	                
+	                
+	                
+	                // Prim
+	                MenuItem prim = new MenuItem("Prim");
+	                algorithms.getItems().add(prim);
+	                prim.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	Prim();
+	                    }
+	                });
+	                
+	                // Dijkstra
+	                MenuItem dijkstra = new MenuItem("Dijkstra");
+	                algorithms.getItems().add(dijkstra);
+	                dijkstra.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	SplitPane sp = new SplitPane();
+	                    	Text t = new Text("Digite o vértice:");
+	                    	TextField tf = new TextField();
+	                    	Button execute = new Button("Executar");
+	                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+	                    		@Override public void handle(ActionEvent e){
+	                    			Dijkstra('g', Integer.parseInt(tf.getText()));
+	                    		}
+	                    	});
+	                    	sp.getItems().addAll(t, tf, execute);
+	                    	mainApp.getBP().setBottom(sp);
+	                    	Dijkstra('g', 0);
+	                    }
+	                });
+                }else{
+	                
+	                // Dijkstra
+	                MenuItem dijkstra = new MenuItem("Dijkstra");
+	                algorithms.getItems().add(dijkstra);
+	                dijkstra.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	SplitPane sp = new SplitPane();
+	                    	Text t = new Text("Digite o vértice:");
+	                    	TextField tf = new TextField();
+	                    	Button execute = new Button("Executar");
+	                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+	                    		@Override public void handle(ActionEvent e){
+	                    			Dijkstra('d', Integer.parseInt(tf.getText()));
+	                    		}
+	                    	});
+	                    	sp.getItems().addAll(t, tf, execute);
+	                    	mainApp.getBP().setBottom(sp);
+	                    	Dijkstra('d', 0);
 	                    }
 	                });
                 }
@@ -206,8 +305,33 @@ public class MainController {
     	graph.addObjects(mainApp.getBP());
     }
     
+    private void clearObjects(){
+    	graph.clearObjects();
+    }
+    
+    private void buscaLargura(int vertex){
+    	clearObjects();
+    	WidthSearch w = new WidthSearch(grafo);
+    	w.process(vertex);
+    	int distance[] = w.getDistances();
+        int nCores = 10;
+        
+        int coresStep = 250 / nCores;
+        
+        RainbowScale rbS = new RainbowScale();
+		for(int i=0; i< grafo.getNumVertices(); i++){
+            if(distance[i] == Integer.MAX_VALUE){
+                System.out.println("D ["+i+"]: XX\n");
+                this.graph.getVertex().get(i).changeColor(rbS.getColor(255));
+            }else{
+                System.out.println("D ["+i+"]: "+distance[i]+"\n");
+	            this.graph.getVertex().get(i).changeColor(rbS.getColor(distance[i] * coresStep));
+            }
+		}
+    }
+    
     private void coloracao(){
-    	if(grafo == null) return;
+    	clearObjects();
         Coloracao coloracao = new Coloracao();
         coloracao.execute(grafo);
         int cores[] = coloracao.getCores();
@@ -217,14 +341,49 @@ public class MainController {
         RainbowScale rbS = new RainbowScale();
         for (int i = 0; i < cores.length; i++) {
             System.out.println("Vertice: " + i + " Cor: " + cores[i]);
-            this.graph.getVertex().get(i).setColor(rbS.getColor(cores[i] * coresStep));
-            this.graph.getVertex().get(i).changeColor();
+            this.graph.getVertex().get(i).changeColor(rbS.getColor(cores[i] * coresStep));
         }
     }
     
+    private void Prim(){
+    	clearObjects();
+    	controller.Prim p = new controller.Prim(grafo);
+    	Grafo primG = p.process(0);
+    	
+    	for (Edge edge : this.graph.getEdges()) {
+            edge.getConnect().setOpacity(0.1f);
+        }
+    	
+    	for (Vertex vertex : this.graph.getVertex()) {
+    		vertex.getCircle().setOpacity(0.1f);
+        }
+    	
+    	ListaAdjacencia l = (ListaAdjacencia) primG.getRepresentacao();
+    	l.prim(graph);
+    }
+    
+    private void Dijkstra(char type, int vertex){
+    	clearObjects();
+    	controller.Dijkstra d = new controller.Dijkstra(grafo);
+    	int pi[] = d.process(vertex, type);
+    	int x=0;
+    	while(x < grafo.getNumVertices()){
+	    	for (Edge edge : graph.getEdges()) {
+	    		if(x == edge.getTarget().getID() && pi[x] == edge.getSource().getID()){
+	    			edge.direct();
+	    			edge.getConnect().setOpacity(1.0f);
+	    			edge.getConnect().setStrokeWidth(3.0f);
+	    		}
+	    		System.out.print(edge.getSource().getID()+"->"+edge.getTarget().getID()+"| ");
+	    	}
+    		System.out.println("\nP "+x+":"+pi[x]);
+    		x++;
+    	}
+    }
+    
     private void componentes(){
+    	clearObjects();
     	// TODO add your handling code here:
-    	if(grafo == null) return;
     	ComponentesConexas componentesConexas = new ComponentesConexas();
         componentesConexas.execute(grafo);
         int comp[] = componentesConexas.getComponentes();
@@ -233,8 +392,7 @@ public class MainController {
         RainbowScale rbS = new RainbowScale();
         for (int i = 0; i < comp.length; i++) {
             System.out.println("Vertice: " + i + " Componente: " + comp[i]);
-            this.graph.getVertex().get(i).setColor(rbS.getColor(comp[i] * compStep));
-            this.graph.getVertex().get(i).changeColor();
+            this.graph.getVertex().get(i).changeColor(rbS.getColor(comp[i] * compStep));
         }
     }
     

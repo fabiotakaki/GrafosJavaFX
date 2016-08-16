@@ -7,7 +7,6 @@ package Grafos.desenho;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.Cursor;
-import javafx.scene.canvas.GraphicsContext;
 
 public class Vertex {
     private float x;
@@ -27,39 +26,26 @@ public class Vertex {
     public void setID(int ID) {
         this.ID = ID;
     }
-
-    public void draw(GraphicsContext g2) {
-        if (this.selected) {
-            g2.setGlobalAlpha(1.0f);
-            g2.setLineWidth(3.0f);
-        } else { //not selected and there is not a global vertex selected
-            g2.setGlobalAlpha(0.2f);
-            g2.setLineWidth(1.5f);
+    
+    public void clear(){
+    	if(this.selected){
+        	vertex.setOpacity(1.0f);
+        	vertex.setStrokeWidth(3.0f);
+        }else{
+        	vertex.setOpacity(0.2f);
+        	vertex.setStrokeWidth(1.5f);
         }
-
-        g2.setFill(this.color);
-        g2.fillOval(((int) this.x) - this.getRay(), ((int) this.y)
-                - this.getRay(), this.getRay() * 2, this.getRay() * 2);
-
-        g2.setStroke(Color.BLACK);
-        g2.setLineWidth(3);
-        g2.strokeOval(((int) this.x) - this.getRay(), ((int) this.y)
-                - this.getRay(), this.getRay() * 2, this.getRay() * 2);
-        g2.setGlobalAlpha(1.0f);
+        
+        vertex.setStroke(Color.BLACK);
+        
+        this.changeColor();
     }
     
     public Circle createCircle() {
         vertex = new Circle(((int) this.x) - this.getRay(), ((int) this.y)
                 - this.getRay(), this.getRay() * 2, this.color);
         
-        if(this.selected){
-        	vertex.setOpacity(1.0f);
-        	vertex.setStrokeWidth(3.0f);
-        }else{
-        	vertex.setStyle("opacity:0.2;");
-        	vertex.setOpacity(0.2f);
-        	vertex.setStrokeWidth(1.5f);
-        }
+        this.clear();
         
         vertex.setStroke(Color.BLACK);
 
@@ -91,10 +77,13 @@ public class Vertex {
     	return this.vertex;
     }
     
+    public void changeColor(Color color){
+    	vertex.setFill(color);
+    }
+    
     public void changeColor(){
     	vertex.setFill(this.color);
     }
-    
 
     public float getX() {
         return x;

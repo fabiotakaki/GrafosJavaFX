@@ -18,4 +18,8 @@ public abstract class Representacao {
     public abstract void addAresta(int vIni, int vFim, int weight);
     public abstract void addArestaD(int vIni, int vFim, int weight);
     public abstract void imprimeRepresentacao(String mensagem);
+    public abstract boolean verifyAdjacency(int u, int v);
+	public abstract int getWeight(int u, int v);
+	public abstract int[][] getInverse();
+	public abstract int[][] getInverseWeight();
 }
