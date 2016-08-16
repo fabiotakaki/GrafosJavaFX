@@ -10,6 +10,7 @@ import Grafos.desenho.color.RainbowScale;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
 
@@ -74,16 +75,18 @@ public class Graph {
     	//Draw each vertice of the graph
         for (Vertex v : this.vertex) {
             Circle circle = v.createCircle();
-            group.getChildren().add(circle);
+            TextFlow idVertex = v.createText();
+            group.getChildren().addAll(circle, idVertex);
         }
         
         for (Edge edge : edges) {
             Group line = edge.connect(edge.getSource().getCircle(), edge.getTarget().getCircle());
             group.getChildren().add(line);
             edge.getSource().getCircle().toFront();
+            edge.getSource().getText().toFront();
             edge.getTarget().getCircle().toFront();
+            edge.getTarget().getText().toFront();
         }
-        
         bp.setCenter(group);
     }
     

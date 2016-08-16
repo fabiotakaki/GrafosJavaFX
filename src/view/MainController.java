@@ -11,6 +11,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -34,6 +35,7 @@ import controller.Transposed;
 import controller.WidthSearch;
 //algoritmos
 import controller.ComponentesConexas;
+import controller.Connectivity;
 import controller.Coloracao;
 
 import Grafos.desenho.Edge;
@@ -164,7 +166,6 @@ public class MainController {
                     
 
                 }  //se tiver peso nas arestas, adicionar mais uma leitura de token
-
                 this.addObjects();
                 
                 // Gero o menu algoritmos
@@ -276,6 +277,24 @@ public class MainController {
 	                    	Dijkstra('d', 0);
 	                    }
 	                });
+	                
+	                // Transposição
+	                MenuItem transposed = new MenuItem("Transposição");
+	                algorithms.getItems().add(transposed);
+	                transposed.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	transposed();
+	                    }
+	                });
+	                
+	                // Conectividade
+	                MenuItem connectivity = new MenuItem("Conectividade");
+	                algorithms.getItems().add(connectivity);
+	                connectivity.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	connectivity();
+	                    }
+	                });
                 }
                 
                 // mensagem
@@ -306,7 +325,7 @@ public class MainController {
     }
     
     private void clearObjects(){
-    	graph.clearObjects();
+    	graph.clearObjects();	
     }
     
     private void buscaLargura(int vertex){
@@ -394,6 +413,33 @@ public class MainController {
             System.out.println("Vertice: " + i + " Componente: " + comp[i]);
             this.graph.getVertex().get(i).changeColor(rbS.getColor(comp[i] * compStep));
         }
+    }
+    
+    private void transposed(){
+    	clearObjects();
+    	Transposed t = new Transposed(grafo);
+    	t.execute();
+    	
+    	BorderPane pane;
+    	pane = new BorderPane();
+		Scene scene = new Scene(pane, 400, 400);	
+
+	    Stage newStage = new Stage();
+	    newStage.setScene(scene);
+
+	    newStage.initModality(Modality.APPLICATION_MODAL);
+	    newStage.setTitle("Transposição");
+	    
+	    Graph d = t.getGraph();
+	    d.addObjects(pane);
+        
+        newStage.showAndWait();
+    }
+    
+    private void connectivity(){
+    	clearObjects();
+    	Connectivity c = new Connectivity(grafo, graph);
+    	c.process(0);
     }
     
     

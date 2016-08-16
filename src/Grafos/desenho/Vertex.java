@@ -6,16 +6,21 @@ package Grafos.desenho;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.Cursor;
 
 public class Vertex {
     private float x;
     private float y;
-    private int ray = 8;
+    private int ray = 10;
     private Boolean selected = true;
     private Color color = Color.RED;
     private int ID;
     private Circle vertex;
+    TextFlow idVertex;
     
     private double orgSceneX, orgSceneY;
 
@@ -41,6 +46,21 @@ public class Vertex {
         this.changeColor();
     }
     
+    public TextFlow createText(){
+    	idVertex = new TextFlow();
+        idVertex.setLayoutX(vertex.getCenterX() - 4);
+        idVertex.setLayoutY(vertex.getCenterY() - 6);
+        Text text = new Text(Integer.toString(this.ID));
+        text.setFont(Font.font("Arial", FontWeight.BOLD, 15));
+        text.setFill(Color.BLUEVIOLET);
+        idVertex.getChildren().addAll(text);
+        return idVertex;
+    }
+    
+    public TextFlow getText(){
+    	return idVertex;
+    }
+    
     public Circle createCircle() {
         vertex = new Circle(((int) this.x) - this.getRay(), ((int) this.y)
                 - this.getRay(), this.getRay() * 2, this.color);
@@ -56,7 +76,10 @@ public class Vertex {
           orgSceneY = t.getSceneY();
 
           Circle c = (Circle) (t.getSource());
+          idVertex.setLayoutX(c.getCenterX() - 4);
+          idVertex.setLayoutY(c.getCenterY() - 6);
           c.toFront();
+          idVertex.toFront();
         });
         vertex.setOnMouseDragged((t) -> {
           double offsetX = t.getSceneX() - orgSceneX;
@@ -66,6 +89,8 @@ public class Vertex {
 
           c.setCenterX(c.getCenterX() + offsetX);
           c.setCenterY(c.getCenterY() + offsetY);
+          idVertex.setLayoutX(c.getCenterX() - 4);
+          idVertex.setLayoutY(c.getCenterY() - 6);
 
           orgSceneX = t.getSceneX();
           orgSceneY = t.getSceneY();

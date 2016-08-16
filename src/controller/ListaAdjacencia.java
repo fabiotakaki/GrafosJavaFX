@@ -93,8 +93,11 @@ public class ListaAdjacencia extends Representacao{
                 g.getVertex().get(aux.getVertID()).getCircle().setOpacity(1.0f);
                 
                 for (Edge edge : g.getEdges()) {
-                    if(edge.getSource().getID() == i && edge.getTarget().getID() == aux.getVertID())
+                    if(edge.getSource().getID() == i && edge.getTarget().getID() == aux.getVertID()){
                     	edge.getConnect().setOpacity(1.0f);
+                   		edge.getConnect().setOpacity(1.0f);
+                   		edge.getConnect().setStrokeWidth(3.0f);
+                    }
                 }
                 
                 aux = aux.getProx();

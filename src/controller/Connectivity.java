@@ -1,7 +1,13 @@
 package controller;
 
-public class DepthSearch {
+import Grafos.desenho.Graph;
+import Grafos.desenho.color.RainbowScale;
+import javafx.scene.paint.Color;
+
+public class Connectivity {
 	private Grafo g;
+	private Grafo t;
+	private Graph d;
 	private String[] colors;
 	private int[] starts;
 	private int[] ends;
@@ -11,6 +17,9 @@ public class DepthSearch {
 	private int goodPath[];
 	private boolean verify;
 	
+	//cor
+	private Color color;
+	
 	/*
 	 * colors:
 	 *		w: white
@@ -18,8 +27,9 @@ public class DepthSearch {
 	 *		b: black
 	 */
 	
-	public DepthSearch(Grafo g){
+	public Connectivity(Grafo g, Graph d){
 		this.g 		= g;
+		this.d		= d;
 		this.time	= 0;
 		this.colors = new String[g.getNumVertices()];
 		this.starts = new int[g.getNumVertices()];
@@ -30,9 +40,18 @@ public class DepthSearch {
 	}
 	
 	public boolean process(int num){
-		if(num >= g.getNumVertices())
+		//transposição
+		Transposed tp = new Transposed(g);
+		this.t = tp.execute();
+		
+		//cores
+		RainbowScale cS = new RainbowScale();
+		int colorStep = 255 / t.getNumVertices();
+		this.color = cS.getColor(0*colorStep);
+		
+		if(num >= t.getNumVertices())
                     return false;
-		for(int i=0; i< g.getNumVertices(); i++){
+		for(int i=0; i< t.getNumVertices(); i++){
 			this.colors[i] = "w";
 			this.goodPath[i] = -1;
 		}
@@ -43,22 +62,24 @@ public class DepthSearch {
 			visit(num); // visito o vértice inicial
 		}
         verify = false;
-		for(int i=0; i< g.getNumVertices(); i++){
+		for(int i=0; i< t.getNumVertices(); i++){
+			this.color = cS.getColor((i+1)*colorStep);
 			if(colors[i].equals("w")){
 				visit(i); // visito o vértice
 			}
 		}
                 
-                return true;
+        return true;
 	}
 	
 	protected void visit(int i){
+		d.getVertex().get(i).changeColor(this.color);
 		this.colors[i] = "g";
 		this.time++;
 		this.starts[i] = time;
 		
-		for(int j=0; j < g.getNumVertices(); j++){
-			if(g.verifyAdjacency(i, j)){
+		for(int j=0; j < t.getNumVertices(); j++){
+			if(t.verifyAdjacency(i, j)){
 				if(colors[j] == "w"){
 					visit(j);
 					if(verify) goodPath[j] = i;
@@ -76,10 +97,10 @@ public class DepthSearch {
 	}
 	
 	public String show(){
-            String imp = "";
-		for(int i=0; i< g.getNumVertices(); i++){
+        String imp = "";
+		for(int i=0; i< t.getNumVertices(); i++){
                     imp = imp+i+"\nChegada:" + starts[i]+"\nFinal:" + ends[i]+"\n\n";
 		}
-                return imp;
+        return imp;
 	}
 }
