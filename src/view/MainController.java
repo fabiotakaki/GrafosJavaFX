@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 import controller.Grafo;
 import controller.ListaAdjacencia;
+import controller.TopologicalOrder;
 import controller.Transposed;
 import controller.WidthSearch;
 //algoritmos
@@ -100,8 +101,11 @@ public class MainController {
     private void saveToPNG(){
     	FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Salvar PNG");
-         
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG png(*.png)", "*.png"));
         File file = fileChooser.showSaveDialog(mainApp.getPrimaryStage());
+        if(!file.getName().contains(".")) {
+    	  file = new File(file.getAbsolutePath() + ".png");
+    	}
         
     	FxImaging imager = new FxImaging();
         imager.nodeToImage(mainApp.getBP().getCenter(),mainApp.getBP().getChildren(),file);
@@ -158,12 +162,6 @@ public class MainController {
                     	this.graph.addEdge(e);    //desenho
                     }
                     
-                    
-//                    //Exemplo de seleção de aresta
-//                    if (vIni % 2 == 0){
-//                        e.setSelected(true);                        
-//                    }
-                    
 
                 }  //se tiver peso nas arestas, adicionar mais uma leitura de token
                 this.addObjects();
@@ -184,6 +182,7 @@ public class MainController {
 					public void handle(ActionEvent event) {
 						// TODO Auto-generated method stub
 						clearObjects();
+						mainApp.getBP().setBottom(null);
 					} 	
                 });
                 
@@ -233,7 +232,18 @@ public class MainController {
 	                algorithms.getItems().add(prim);
 	                prim.setOnAction(new EventHandler<ActionEvent>() {
 	                    @Override public void handle(ActionEvent e) {
-	                    	Prim();
+	                    	SplitPane sp = new SplitPane();
+	                    	Text t = new Text("Digite o vértice:");
+	                    	TextField tf = new TextField();
+	                    	Button execute = new Button("Executar");
+	                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+	                    		@Override public void handle(ActionEvent e){
+	                    			Prim(Integer.parseInt(tf.getText()));
+	                    		}
+	                    	});
+	                    	sp.getItems().addAll(t, tf, execute);
+	                    	mainApp.getBP().setBottom(sp);
+	                    	Prim(0);
 	                    }
 	                });
 	                
@@ -292,7 +302,38 @@ public class MainController {
 	                algorithms.getItems().add(connectivity);
 	                connectivity.setOnAction(new EventHandler<ActionEvent>() {
 	                    @Override public void handle(ActionEvent e) {
-	                    	connectivity();
+	                    	SplitPane sp = new SplitPane();
+	                    	Text t = new Text("Digite o vértice:");
+	                    	TextField tf = new TextField();
+	                    	Button execute = new Button("Executar");
+	                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+	                    		@Override public void handle(ActionEvent e){
+	                    			connectivity(Integer.parseInt(tf.getText()));
+	                    		}
+	                    	});
+	                    	sp.getItems().addAll(t, tf, execute);
+	                    	mainApp.getBP().setBottom(sp);
+	                    	connectivity(0);
+	                    }
+	                });
+	                
+	                // Ordem topológica
+	                MenuItem topological = new MenuItem("Ordem Topológica");
+	                algorithms.getItems().add(topological);
+	                topological.setOnAction(new EventHandler<ActionEvent>() {
+	                    @Override public void handle(ActionEvent e) {
+	                    	SplitPane sp = new SplitPane();
+	                    	Text t = new Text("Digite o vértice:");
+	                    	TextField tf = new TextField();
+	                    	Button execute = new Button("Executar");
+	                    	execute.setOnAction(new EventHandler<ActionEvent>(){
+	                    		@Override public void handle(ActionEvent e){
+	                    			topological(Integer.parseInt(tf.getText()));
+	                    		}
+	                    	});
+	                    	sp.getItems().addAll(t, tf, execute);
+	                    	mainApp.getBP().setBottom(sp);
+	                    	topological(0);
 	                    }
 	                });
                 }
@@ -351,6 +392,7 @@ public class MainController {
     
     private void coloracao(){
     	clearObjects();
+    	mainApp.getBP().setBottom(null);
         Coloracao coloracao = new Coloracao();
         coloracao.execute(grafo);
         int cores[] = coloracao.getCores();
@@ -364,10 +406,10 @@ public class MainController {
         }
     }
     
-    private void Prim(){
+    private void Prim(int v){
     	clearObjects();
     	controller.Prim p = new controller.Prim(grafo);
-    	Grafo primG = p.process(0);
+    	Grafo primG = p.process(v);
     	
     	for (Edge edge : this.graph.getEdges()) {
             edge.getConnect().setOpacity(0.1f);
@@ -402,6 +444,7 @@ public class MainController {
     
     private void componentes(){
     	clearObjects();
+    	mainApp.getBP().setBottom(null);
     	// TODO add your handling code here:
     	ComponentesConexas componentesConexas = new ComponentesConexas();
         componentesConexas.execute(grafo);
@@ -417,6 +460,7 @@ public class MainController {
     
     private void transposed(){
     	clearObjects();
+    	mainApp.getBP().setBottom(null);
     	Transposed t = new Transposed(grafo);
     	t.execute();
     	
@@ -436,11 +480,22 @@ public class MainController {
         newStage.showAndWait();
     }
     
-    private void connectivity(){
+    private void connectivity(int vertex){
     	clearObjects();
     	Connectivity c = new Connectivity(grafo, graph);
-    	c.process(0);
+    	c.process(vertex);
+    }
+    
+    private void topological(int vertex){
+    	clearObjects();
+    	mainApp.getBP().setBottom(null);
+    	TopologicalOrder to = new TopologicalOrder(grafo, graph);
+    	to.process(vertex);
+    	// redimensiono janela :)
+    	mainApp.getPrimaryStage().setWidth(100*grafo.getNumVertices());
     }
     
     
 }
+    
+ 

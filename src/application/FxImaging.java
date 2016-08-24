@@ -38,7 +38,7 @@ public class FxImaging{
     private Timer timer;
     private Stage stage;
     private Scene scene;
-    private ObservableList list;
+    private ObservableList<Node> list;
     private Node node;
 
     /**
@@ -76,7 +76,7 @@ public class FxImaging{
      * @param list list of children where the node is kept
      * @param save place where the image to be saved
      */
-    public void nodeToImage(final Node node,final ObservableList list ,final File save){
+    public void nodeToImage(final Node node,final ObservableList<Node> list ,final File save){
         nodeToImage(node,list,save,0,0);
     }
 
@@ -90,7 +90,7 @@ public class FxImaging{
      * @param width width of image to be saved
      * @param height height of image to be saveed
      */
-    public void nodeToImage(final Node node,final ObservableList list,final File save,final double width, final double height){
+    public void nodeToImage(final Node node,final ObservableList<Node> list,final File save,final double width, final double height){
         stage = (Stage)node.getScene().getWindow();
         scene = node.getScene();
         this.node = node;
@@ -193,7 +193,7 @@ public class FxImaging{
 
             }
             else{
-                extension = "jpg";
+                extension = "png";
             }
             ImageIO.write(toBufferedImage(container, bounds), extension, file);
             System.out.println("Node To Image saved");

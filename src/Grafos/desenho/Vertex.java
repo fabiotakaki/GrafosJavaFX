@@ -98,6 +98,10 @@ public class Vertex {
         return vertex;
     }
     
+    public TextFlow getIdVertex(){
+    	return this.idVertex;
+    }
+    
     public Circle getCircle(){
     	return this.vertex;
     }
