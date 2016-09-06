@@ -11,7 +11,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -462,22 +461,25 @@ public class MainController {
     	clearObjects();
     	mainApp.getBP().setBottom(null);
     	Transposed t = new Transposed(grafo);
-    	t.execute();
+    	Grafo gt = t.execute();
     	
-    	BorderPane pane;
-    	pane = new BorderPane();
-		Scene scene = new Scene(pane, 400, 400);	
-
-	    Stage newStage = new Stage();
-	    newStage.setScene(scene);
-
-	    newStage.initModality(Modality.APPLICATION_MODAL);
-	    newStage.setTitle("Transposição");
+//    	BorderPane pane;
+//    	pane = new BorderPane();
+//		Scene scene = new Scene(pane, 400, 400);	
+//
+//	    Stage newStage = new Stage();
+//	    newStage.setScene(scene);
+//
+//	    newStage.initModality(Modality.APPLICATION_MODAL);
+//	    newStage.setTitle("Transposição");
 	    
+    	mainApp.getBP().setCenter(null);
 	    Graph d = t.getGraph();
-	    d.addObjects(pane);
+	    d.addObjects(mainApp.getBP());
+	    this.graph = d;
+	    this.grafo = gt;
         
-        newStage.showAndWait();
+        //newStage.showAndWait();
     }
     
     private void connectivity(int vertex){
